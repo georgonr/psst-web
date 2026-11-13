@@ -1,0 +1,110 @@
+{
+    "default_server_config": {
+        "m.homeserver": {
+            "base_url": "https://chat.macet.eu",
+            "server_name": "chat.macet.eu"
+        }
+    },
+    "disable_custom_urls": true,
+    "disable_guests": true,
+    "disable_login_language_selector": false,
+    "disable_3pid_login": true,
+    "force_verification": true,
+    "brand": "psst",
+    "permalink_prefix": "https://app.macet.eu",
+    "web_base_url": "https://app.macet.eu/",
+    "help_url": "https://github.com/georgonr/psst",
+    "help_encryption_url": "https://github.com/georgonr/psst",
+    "help_key_storage_url": "https://github.com/georgonr/psst",
+    "integrations_ui_url": null,
+    "integrations_rest_url": null,
+    "integrations_widgets_urls": [],
+    "show_labs_settings": false,
+    "default_federate": false,
+    "default_country_code": "SK",
+    "default_theme": "custom-psst",
+    "room_directory": {
+        "servers": ["chat.macet.eu"]
+    },
+    "mobile_guide_toast": false,
+    "desktop_builds": {
+        "available": false,
+        "logo": "vector-icons/favicon.svg",
+        "url": "https://github.com/georgonr/psst"
+    },
+    "mobile_builds": {
+        "ios": null,
+        "android": null,
+        "fdroid": null
+    },
+    "branding": {
+        "logo_link_url": "https://app.macet.eu",
+        "auth_header_logo_url": "themes/element/img/psst/psst-wordmark.svg",
+        "welcome_background_url": "themes/element/img/psst/background.svg",
+        "auth_footer_links": [
+            { "text": "Source code (psst)", "url": "https://github.com/georgonr/psst" },
+            { "text": "Source code (psst-web)", "url": "https://github.com/georgonr/psst-web" }
+        ]
+    },
+    "embedded_pages": {
+        "login_for_welcome": true
+    },
+    "element_call": {
+        "brand": "psst call",
+        "disable": false,
+        "use_exclusively": true
+    },
+    "features": {
+        "feature_video_rooms": true,
+        "feature_element_call_video_rooms": true
+    },
+    "setting_defaults": {
+        "use_system_theme": false,
+        "UIFeature.feedback": false,
+        "UIFeature.identityServer": false,
+        "UIFeature.thirdPartyId": false,
+        "UIFeature.shareSocial": false,
+        "UIFeature.locationSharing": false,
+        "UIFeature.allowCreatingPublicRooms": false,
+        "UIFeature.allowCreatingPublicSpaces": false,
+        "MessageComposerInput.showStickersButton": false,
+        "custom_themes": [
+            {
+                "name": "psst",
+                "is_dark": true,
+                "colors": {
+                    "accent-color": "#38BDF8",
+                    "primary-color": "#38BDF8",
+                    "warning-color": "#F87171",
+                    "sidebar-color": "#020617",
+                    "roomlist-background-color": "#0B1222",
+                    "roomlist-text-color": "#CBD5E1",
+                    "roomlist-text-secondary-color": "#F1F5F9",
+                    "roomlist-highlights-color": "#1E293B",
+                    "roomlist-separator-color": "#334155",
+                    "timeline-background-color": "#0F172A",
+                    "timeline-text-color": "#F1F5F9",
+                    "timeline-text-secondary-color": "#94A3B8",
+                    "timeline-highlights-color": "#1E293B",
+                    "secondary-hairline-color": "#1E293B",
+                    "room-highlight-color": "#38BDF8",
+                    "togglesw-off-color": "#475569"
+                },
+                "compound": {
+                    "--cpd-color-text-action-accent": "#38BDF8",
+                    "--cpd-color-text-badge-accent": "#7DD3FC",
+                    "--cpd-color-bg-accent-rest": "#38BDF8",
+                    "--cpd-color-bg-accent-hovered": "#0EA5E9",
+                    "--cpd-color-bg-accent-pressed": "#0284C7",
+                    "--cpd-color-bg-accent-selected": "#0C4A6E",
+                    "--cpd-color-bg-accent-subtle": "#082F49",
+                    "--cpd-color-bg-badge-accent": "#0C4A6E",
+                    "--cpd-color-border-accent-subtle": "#0369A1",
+                    "--cpd-color-border-accent-primary": "#38BDF8",
+                    "--cpd-color-icon-accent-tertiary": "#38BDF8",
+                    "--cpd-color-icon-accent-primary": "#38BDF8"
+                }
+            }
+        ]
+    }
+}

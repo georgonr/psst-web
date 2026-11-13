@@ -72,7 +72,8 @@ type Writable<T> = NonNullable<
 >;
 
 // Load the default variant as a base configuration
-const DEFAULT_VARIANT = path.join("element.io", "release", "build.json");
+// PSST: default to the psst variant (appId eu.macet.psst, productName psst, psst URL schemes)
+const DEFAULT_VARIANT = path.join("psst", "build.json");
 let variant: Variant = JSON.parse(fs.readFileSync(DEFAULT_VARIANT, "utf8"));
 
 /**
@@ -163,7 +164,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
             "libasound2",
             "libgbm1",
         ],
-        recommends: ["element-io-archive-keyring"],
+        // PSST: no recommendation of the element.io apt keyring package
         fpm: ["--deb-pre-depends", "libc6 (>= 2.35)"],
     },
     mac: {
@@ -174,15 +175,15 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
         gatekeeperAssess: true,
         strictVerify: true,
         entitlements: "./build/entitlements.mac.plist",
-        icon: "build/icon.icon",
+        // PSST: classic .icns built from assets/psst-logo.svg instead of the Element Icon Composer bundle
+        icon: "build/icon.icns",
         mergeASARs: true,
         // The prebuilt seshat binaries are single-arch and present in both halves of the universal build,
         // the loader picks the right one at runtime so they must not be lipo'd together.
         x64ArchFiles: "**/@matrix-org/seshat-darwin-*/*.node",
     },
-    dmg: {
-        badgeIcon: "build/icon.icon",
-    },
+    // PSST: no DMG badge icon (needs pyobjc Quartz on the runner); the DMG uses the app icon
+    dmg: {},
     win: {
         target: ["squirrel", "msi"],
         signtoolOptions: {

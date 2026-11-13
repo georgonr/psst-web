@@ -1,0 +1,7 @@
+{
+    "appId": "eu.macet.psst",
+    "name": "psst",
+    "productName": "psst",
+    "description": "psst - private messenger",
+    "protocols": ["eu.macet.psst", "psst"]
+}

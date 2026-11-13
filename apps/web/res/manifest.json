@@ -2,7 +2,7 @@
     "name": "psst",
     "short_name": "psst",
     "id": "eu.macet.psst",
-    "description": "psst – private messenger",
+    "description": "psst - private messenger",
     "display": "standalone",
     "theme_color": "#0F172A",
     "background_color": "#0F172A",
