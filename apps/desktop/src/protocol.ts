@@ -14,7 +14,8 @@ import { randomUUID } from "node:crypto";
 
 import { type Args, getArgsForProtocolRegistration } from "./args.js";
 
-const LEGACY_PROTOCOL = "element";
+// PSST: legacy SSO scheme is `psst` (must match ElectronPlatform.getSSOCallbackUrl) instead of `element`
+const LEGACY_PROTOCOL = "psst";
 const SEARCH_PARAM = "element-desktop-ssoid";
 const STORE_FILE_NAME = "sso-sessions.json";
 

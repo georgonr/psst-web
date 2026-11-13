@@ -476,7 +476,8 @@ export default class ElectronPlatform extends BasePlatform {
 
     public getSSOCallbackUrl(fragmentAfterLogin?: string): URL {
         const url = super.getSSOCallbackUrl(fragmentAfterLogin);
-        url.protocol = "element";
+        // PSST: own legacy scheme so psst does not compete with Element Desktop for element:// links
+        url.protocol = "psst";
         url.searchParams.set(SSO_ID_KEY, this.sessionId);
         return url;
     }
@@ -536,8 +537,8 @@ export default class ElectronPlatform extends BasePlatform {
     }
 
     public get defaultOAuthClientUri(): string {
-        // Default to element.io as our scheme `io.element.desktop` is within its scope on default MAS policies
-        return "https://element.io";
+        // PSST: our scheme `eu.macet.psst` is the reverse-DNS of macet.eu, so it is in scope on default MAS policies
+        return "https://macet.eu";
     }
 
     public async getOAuthClientMetadata(): Promise<OAuthRegistrationRequest> {
