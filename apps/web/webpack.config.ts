@@ -50,7 +50,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 dotenv.config();
 let ogImageUrl = process.env.RIOT_OG_IMAGE_URL;
-if (!ogImageUrl) ogImageUrl = "https://app.element.io/themes/element/img/logos/opengraph.png";
+// PSST: default opengraph image points at our own deployment instead of app.element.io
+if (!ogImageUrl) ogImageUrl = "https://app.macet.eu/vector-icons/512.png";
 
 const cssThemes = {
     // CSS themes
