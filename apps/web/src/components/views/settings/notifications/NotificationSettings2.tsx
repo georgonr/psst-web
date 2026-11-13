@@ -34,6 +34,7 @@ import { NotificationPusherSettings } from "./NotificationPusherSettings";
 import SettingsFlag from "../../elements/SettingsFlag";
 import { SettingsSubsectionHeading } from "../shared/SettingsSubsectionHeading";
 import { onSubmitPreventDefault } from "../../../../utils/form.ts";
+import SdkConfig from "../../../../SdkConfig"; // PSST: help links point at config help_url
 
 enum NotificationDefaultLevels {
     AllMessages = "all_messages",
@@ -56,7 +57,7 @@ function boldText(text: string): JSX.Element {
 }
 
 function helpLink(sub: string): JSX.Element {
-    return <ExternalLink href="https://element.io/help#settings2">{sub}</ExternalLink>;
+    return <ExternalLink href={SdkConfig.get("help_url")}>{sub}</ExternalLink>;
 }
 
 function useHasUnreadNotifications(): boolean {

@@ -30,6 +30,7 @@ import dispatcher from "../../../dispatcher/dispatcher";
 import E2EIcon from "../../views/rooms/E2EIcon.tsx";
 import { E2EStatus } from "../../../utils/ShieldUtils.ts";
 import { type ResetIdentityBodyVariant } from "../../views/settings/encryption/ResetIdentityBody.tsx";
+import SdkConfig from "../../../SdkConfig"; // PSST: help links point at config help_url
 
 interface IProps {
     onFinished: () => void;
@@ -248,7 +249,7 @@ export default class SetupEncryptionBody extends React.Component<IProps, IState>
                     <EncryptionCardEmphasisedContent>
                         <span>{_t("encryption|verification|confirm_identity_description")}</span>
                         <span>
-                            <ExternalLink href="https://element.io/help#encryption-device-verification">
+                            <ExternalLink href={SdkConfig.get("help_url")}>
                                 {_t("action|learn_more")}
                             </ExternalLink>
                         </span>

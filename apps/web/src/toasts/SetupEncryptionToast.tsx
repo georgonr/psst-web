@@ -33,6 +33,7 @@ import { MatrixClientPeg } from "../MatrixClientPeg";
 import { resetKeyBackupAndWait } from "../utils/crypto/resetKeyBackup";
 import { PosthogAnalytics } from "../PosthogAnalytics";
 import { encryptionSettingsStateForKeyStorageOutOfSyncForgotRecovery } from "../components/views/settings/tabs/user/EncryptionUserSettingsTab.tsx";
+import SdkConfig from "../SdkConfig"; // PSST: help links point at config help_url
 
 const TOAST_KEY = "setupencryption";
 
@@ -133,7 +134,7 @@ const getDescription = (state: DeviceStateForToast): string | React.ReactNode =>
             return _t("encryption|verify_toast_description", undefined, {
                 a: (sub) => (
                     <Link
-                        href="https://docs.element.io/latest/element-support/device-verification/how-to-verify-devices/"
+                        href={SdkConfig.get("help_url")}
                         target="_blank"
                         size="sm"
                     >

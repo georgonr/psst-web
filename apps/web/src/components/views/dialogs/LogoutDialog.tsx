@@ -35,6 +35,7 @@ import { EncryptionCardEmphasisedContent } from "../settings/encryption/Encrypti
 import { type State as EncryptionState } from "../settings/tabs/user/EncryptionUserSettingsTab";
 import { ChangeRecoveryKeyBody } from "../settings/encryption/ChangeRecoveryKeyBody";
 import MatrixClientContext from "../../../contexts/MatrixClientContext";
+import SdkConfig from "../../../SdkConfig"; // PSST: help links point at config help_url
 
 interface IProps {
     onFinished: (success: boolean) => void;
@@ -207,7 +208,7 @@ export default function LogoutDialog(props: IProps): JSX.Element {
                     >
                         <EncryptionCardEmphasisedContent>
                             <Text>{_t("auth|logout_dialog|setup_secure_backup_description")}</Text>
-                            <Text as="a" target="_blank" href="https://element.io/en/help#encryption16">
+                            <Text as="a" target="_blank" href={SdkConfig.get("help_url")}>
                                 {_t("action|learn_more")} <PopOutIcon />
                             </Text>
                         </EncryptionCardEmphasisedContent>

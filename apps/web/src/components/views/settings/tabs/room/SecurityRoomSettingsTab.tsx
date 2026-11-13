@@ -39,7 +39,7 @@ import PosthogTrackers from "../../../../../PosthogTrackers";
 import MatrixClientContext from "../../../../../contexts/MatrixClientContext";
 import { SettingsSection } from "../../shared/SettingsSection";
 import SettingsTab from "../SettingsTab";
-import SdkConfig from "../../../../../SdkConfig";
+import SdkConfig from "../../../../../SdkConfig"; // PSST: also used for help_url links
 import { shouldForceDisableEncryption } from "../../../../../utils/crypto/shouldForceDisableEncryption";
 import { Caption } from "../../../typography/Caption";
 import { MEGOLM_ENCRYPTION_ALGORITHM } from "../../../../../utils/crypto";
@@ -468,7 +468,7 @@ export default class SecurityRoomSettingsTab extends React.Component<IProps, ISt
                     {},
                     {
                         a: (sub) => (
-                            <ExternalLink href="https://element.io/en/help#e2ee-history-sharing">{sub}</ExternalLink>
+                            <ExternalLink href={SdkConfig.get("help_url")}>{sub}</ExternalLink>
                         ),
                     },
                 )}

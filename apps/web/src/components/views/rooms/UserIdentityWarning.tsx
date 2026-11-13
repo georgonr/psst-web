@@ -17,6 +17,7 @@ import {
     type ViolationPrompt,
 } from "../../viewmodels/rooms/UserIdentityWarningViewModel";
 import { type ButtonEvent } from "../elements/AccessibleButton.tsx";
+import SdkConfig from "../../../SdkConfig"; // PSST: help links point at config help_url
 
 interface UserIdentityWarningProps {
     /**
@@ -135,7 +136,7 @@ function memberAvatar(member: RoomMember): React.ReactNode {
 
 function substituteATag(sub: string): React.ReactNode {
     return (
-        <a href="https://element.io/help#encryption18" target="_blank" rel="noreferrer noopener">
+        <a href={SdkConfig.get("help_url")} target="_blank" rel="noreferrer noopener">
             {sub}
         </a>
     );
