@@ -18,3 +18,11 @@ Please see LICENSE files in the repository root for full details.
         display: none;
     }
 }
+
+/* PSST: the left (logo) column only shows the blurred welcome background, which
+   renders washed-out grey behind our white wordmark. Give it a dark tint so the
+   logo keeps contrast and matches the dark right column. */
+.mx_AuthPage_modal_withBlur .mx_AuthHeader {
+    background-color: rgb(2, 6, 23, 0.72);
+    border-radius: var(--cpd-space-6x) 0 0 var(--cpd-space-6x);
+}
