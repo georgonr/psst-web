@@ -24,7 +24,9 @@
     "default_country_code": "SK",
     "default_theme": "custom-psst",
     "room_directory": {
-        "servers": ["chat.macet.eu"]
+        "servers": [
+            "chat.macet.eu"
+        ]
     },
     "mobile_guide_toast": false,
     "desktop_builds": {
@@ -42,8 +44,18 @@
         "auth_header_logo_url": "themes/element/img/psst/psst-wordmark.svg",
         "welcome_background_url": "themes/element/img/psst/background.svg",
         "auth_footer_links": [
-            { "text": "Source code (psst)", "url": "https://github.com/georgonr/psst" },
-            { "text": "Source code (psst-web)", "url": "https://github.com/georgonr/psst-web" }
+            {
+                "text": "Podmienky / Terms",
+                "url": "https://app.macet.eu/terms.html"
+            },
+            {
+                "text": "Súkromie / Privacy",
+                "url": "https://app.macet.eu/privacy.html"
+            },
+            {
+                "text": "Source code",
+                "url": "https://github.com/georgonr/psst"
+            }
         ]
     },
     "embedded_pages": {
@@ -106,5 +118,21 @@
                 }
             }
         ]
-    }
+    },
+    "oidc_metadata": {
+        "client_uri": "https://app.macet.eu",
+        "logo_uri": "https://app.macet.eu/vector-icons/512.png",
+        "tos_uri": "https://app.macet.eu/terms.html",
+        "policy_uri": "https://app.macet.eu/privacy.html"
+    },
+    "terms_and_conditions_links": [
+        {
+            "text": "Podmienky používania / Terms",
+            "url": "https://app.macet.eu/terms.html"
+        },
+        {
+            "text": "Ochrana súkromia / Privacy",
+            "url": "https://app.macet.eu/privacy.html"
+        }
+    ]
 }
