@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="glow" cx="0.2" cy="0.15" r="0.9">
+      <stop offset="0" stop-color="#0C4A6E"/>
+      <stop offset="0.55" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+</svg>

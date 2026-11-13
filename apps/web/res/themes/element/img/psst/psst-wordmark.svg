@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="160" viewBox="0 0 300 160">
+  <title>psst</title>
+  <rect x="20" y="38" width="13" height="84" rx="6.5" fill="#38BDF8" fill-opacity="1"/>
+  <rect x="43" y="52" width="13" height="56" rx="6.5" fill="#FFFFFF" fill-opacity="1"/>
+  <rect x="66" y="64" width="13" height="32" rx="6.5" fill="#FFFFFF" fill-opacity="0.72"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M100,62 V124"/>
+    <path d="M100,80 a18,18 0 1 0 36,0 a18,18 0 1 0 -36,0"/>
+    <path d="M190,68 C186,63 180,62 174,62 C164,62 158,66 158,71 C158,77 164,79 174,80 C184,81 190,83 190,89 C190,95 184,98 174,98 C168,98 161,97 158,92"/>
+    <path d="M244,68 C240,63 234,62 228,62 C218,62 212,66 212,71 C212,77 218,79 228,80 C238,81 244,83 244,89 C244,95 238,98 228,98 C222,98 215,97 212,92"/>
+    <path d="M262,46 V88 C262,95 266,98 274,98"/>
+    <path d="M252,62 H276"/>
+  </g>
+</svg>
