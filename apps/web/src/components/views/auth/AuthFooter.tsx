@@ -10,7 +10,6 @@ Please see LICENSE files in the repository root for full details.
 import React, { type JSX, type ReactElement } from "react";
 
 import SdkConfig from "../../../SdkConfig";
-import { _t } from "../../../languageHandler";
 
 const AuthFooter = (): ReactElement => {
     const brandingConfig = SdkConfig.getObject("branding");
@@ -29,12 +28,11 @@ const AuthFooter = (): ReactElement => {
         );
     }
 
+    // PSST: the footer only shows the links from config.json (our source code links); the hardcoded
+    // "Powered by Matrix" link to matrix.org is dropped.
     return (
         <footer className="mx_AuthFooter" role="contentinfo">
             {authFooterLinks}
-            <a href="https://matrix.org" target="_blank" rel="noreferrer noopener">
-                {_t("powered_by_matrix")}
-            </a>
         </footer>
     );
 };

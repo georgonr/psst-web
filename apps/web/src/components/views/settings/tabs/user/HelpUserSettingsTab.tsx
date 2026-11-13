@@ -99,6 +99,30 @@ export default class HelpUserSettingsTab extends React.Component<EmptyObject, IS
         );
     }
 
+    /**
+     * PSST: links to the source code of this build, as required by the AGPL-3.0 licence of Element.
+     * Not translated on purpose (like the credits below, it is licence-related text).
+     */
+    private renderSourceCode(): JSX.Element {
+        return (
+            <SettingsSubsection heading="Source code">
+                <SettingsSubsectionText>
+                    psst is free software based on Element, licensed under the GNU Affero General Public License v3.0.
+                    <ul>
+                        <li>
+                            <ExternalLink href="https://github.com/georgonr/psst">github.com/georgonr/psst</ExternalLink>
+                        </li>
+                        <li>
+                            <ExternalLink href="https://github.com/georgonr/psst-web">
+                                github.com/georgonr/psst-web
+                            </ExternalLink>
+                        </li>
+                    </ul>
+                </SettingsSubsectionText>
+            </SettingsSubsection>
+        );
+    }
+
     private renderCredits(): JSX.Element {
         // Note: This is not translated because it is legal text.
         // Also, &nbsp; is ugly but necessary.
@@ -264,6 +288,7 @@ export default class HelpUserSettingsTab extends React.Component<EmptyObject, IS
                             {updateButton}
                         </SettingsSubsectionText>
                     </SettingsSubsection>
+                    {this.renderSourceCode()}
                     {this.renderLegal()}
                     {this.renderCredits()}
                     <SettingsSubsection heading={_t("common|advanced")}>
