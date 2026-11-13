@@ -65,8 +65,8 @@
         "UIFeature.thirdPartyId": false,
         "UIFeature.shareSocial": false,
         "UIFeature.locationSharing": false,
-        "UIFeature.allowCreatingPublicRooms": false,
-        "UIFeature.allowCreatingPublicSpaces": false,
+        "UIFeature.allowCreatingPublicRooms": true,
+        "UIFeature.allowCreatingPublicSpaces": true,
         "MessageComposerInput.showStickersButton": false,
         "custom_themes": [
             {
