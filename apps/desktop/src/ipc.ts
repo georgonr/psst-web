@@ -11,6 +11,18 @@ import IpcMainEvent = Electron.IpcMainEvent;
 import { randomArray } from "./utils.js";
 import { consumeDisplayMediaCallback } from "./displayMediaCallback.js";
 import Store, { clearData } from "./store.js";
+import { createRequire } from "node:module";
+
+function psstVersion(): string {
+    try {
+        const pkg = createRequire(import.meta.url)("../package.json") as { psstBuild?: string | number; psstBuildDate?: string };
+        const d = String(pkg.psstBuildDate ?? "");
+        if (pkg.psstBuild && /^\d{8}$/.test(d)) return `${app.getVersion()}-b${pkg.psstBuild} (${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6)})`;
+    } catch {
+        /* fall through */
+    }
+    return app.getVersion();
+}
 import { getConfig } from "./config.js";
 
 let focusHandlerAttached = false;
@@ -62,7 +74,8 @@ ipcMain.on("ipcCall", async function (_ev: IpcMainEvent, payload) {
             global.appLocalization.setAppLocale(args[0]);
             break;
         case "getAppVersion":
-            ret = app.getVersion();
+            // PSST: show the build number and date in Help & About, e.g. "1.12.35-b12 (2026-11-15)" (D54)
+            ret = psstVersion();
             break;
         case "focusWindow":
             if (global.mainWindow.isMinimized()) {
