@@ -37,6 +37,7 @@ import Store from "./store.js";
 import { buildMenuTemplate } from "./vectormenu.js";
 import webContentsHandler from "./webcontents-handler.js";
 import * as updater from "./updater.js";
+import { startPsstUpdateCheck } from "./psst-update-check.js";
 import ProtocolHandler from "./protocol.js";
 import { _t, AppLocalization } from "./language-helper.js";
 import { setDisplayMediaCallback } from "./displayMediaCallback.js";
@@ -232,6 +233,8 @@ app.on("ready", async () => {
     } else {
         console.log("No update_base_url is defined: auto update is disabled");
     }
+    // PSST: notify about new builds from app.macet.eu/download instead of Element's updater (D59)
+    if (args.update) startPsstUpdateCheck();
 
     // Set up i18n before loading storage as we need translations for dialogs
     global.appLocalization = new AppLocalization({

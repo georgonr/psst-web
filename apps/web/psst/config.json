@@ -45,6 +45,10 @@
         "welcome_background_url": "themes/element/img/psst/background.svg",
         "auth_footer_links": [
             {
+                "text": "Download apps",
+                "url": "https://app.macet.eu/download/"
+            },
+            {
                 "text": "Podmienky / Terms",
                 "url": "https://app.macet.eu/terms.html"
             },
