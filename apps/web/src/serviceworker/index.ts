@@ -157,8 +157,18 @@ function psstIsVerification(roomId?: string): boolean {
     return Boolean(roomId?.startsWith("!psst-verification:"));
 }
 
-async function psstOnPush(data: PsstPushPayload): Promise<void> {
+/** Open windows of the app itself (not /admin, /download, … on the same origin). */
+async function psstAppWindows(): Promise<WindowClient[]> {
+    const scope = new URL(self.registration.scope).pathname;
     const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    return windows.filter((w) => {
+        const p = new URL(w.url).pathname;
+        return p === scope || p === `${scope}index.html`;
+    });
+}
+
+async function psstOnPush(data: PsstPushPayload): Promise<void> {
+    const windows = await psstAppWindows();
     if (windows.some((w) => w.focused && w.visibilityState === "visible")) {
         return; // the app is in front: it shows its own notification (and the browser needs none from us)
     }
@@ -203,7 +213,7 @@ self.addEventListener("notificationclick", (event: NotificationEvent) => {
     const url = new URL(roomId ? `#/room/${roomId}` : "#/home", self.registration.scope).href;
     event.waitUntil(
         (async (): Promise<void> => {
-            const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+            const windows = await psstAppWindows();
             const win = windows.find((w) => w.focused) ?? windows[0];
             if (win) {
                 await win.focus();
