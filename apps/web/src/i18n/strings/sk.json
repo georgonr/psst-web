@@ -1009,7 +1009,7 @@
             "other_party_cancelled": "Proti strana zrušila overovanie.",
             "prompt_encrypted": "Overte všetkých používateľov v miestnosti, aby ste sa uistili, že je zabezpečená.",
             "prompt_unencrypted": "V šifrovaných miestnostiach overte všetkých používateľov, aby ste zaistili ich bezpečnosť.",
-            "psst_no_notification": "Žiadosť nepríde ako upozornenie: druhé zariadenie ju dostane, len keď je v ňom appka otvorená. Žiadosť platí asi 10 minút.",
+            "psst_no_notification": "psst na Androide ukáže upozornenie „Žiadosť o overenie“. Na iPhone a v iných appkách žiadosť ako upozornenie nepríde — appku treba otvoriť. Žiadosť platí asi 10 minút.",
             "psst_open_app_now": "Teraz otvorte psst (alebo Element) na druhom zariadení a žiadosť tam prijmite.",
             "psst_request_expired": "Platnosť žiadosti vypršala. Pošlite ju znova a na druhom zariadení otvorte appku.",
             "psst_request_valid": "Čaká sa na druhé zariadenie…",

@@ -1056,7 +1056,7 @@
             "other_party_cancelled": "The other party cancelled the verification.",
             "prompt_encrypted": "Verify all users in a room to ensure it's secure.",
             "prompt_unencrypted": "In encrypted rooms, verify all users to ensure it's secure.",
-            "psst_no_notification": "The request does not arrive as a notification: your other device only receives it while the app is open. The request is valid for about 10 minutes.",
+            "psst_no_notification": "psst on Android shows a “Verification request” notification. On iPhone and in other apps the request does not arrive as a notification — open the app. The request is valid for about 10 minutes.",
             "psst_open_app_now": "Open psst (or Element) on your other device now and accept the request there.",
             "psst_request_expired": "The request has expired. Send it again and open the app on your other device.",
             "psst_request_valid": "Waiting for your other device…",
