@@ -1193,10 +1193,24 @@ export async function onLoggedOut(): Promise<void> {
 let loggedOutStorageCleared: Promise<void> | undefined;
 
 async function clearLoggedOutStorage(): Promise<void> {
+    // PSST (D75): not personal data — keep it so the screen does not open again after every re-login
+    let psstAlertsSeen: string | null = null;
+    try {
+        psstAlertsSeen = window.localStorage?.getItem("psst_alerts_auto_version") ?? null;
+    } catch {
+        /* no storage */
+    }
     await clearStorage({ deleteEverything: true });
     clearUploadedMediaCache();
     await PlatformPeg.get()?.clearStorage();
     SettingsStore.reset();
+    if (psstAlertsSeen) {
+        try {
+            window.localStorage?.setItem("psst_alerts_auto_version", psstAlertsSeen);
+        } catch {
+            /* no storage */
+        }
+    }
 }
 
 /**
