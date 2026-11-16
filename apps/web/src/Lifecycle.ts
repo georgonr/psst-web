@@ -1228,6 +1228,8 @@ export async function clearStorage(opts?: { deleteEverything?: boolean }): Promi
         // try to save any 3pid invites from being obliterated and registration time
         const pendingInvites = ThreepidInviteStore.instance.getWireInvites();
         const registrationTime = window.localStorage.getItem("mx_registration_time");
+        // PSST (D75): the "Notifications & calls" screen opens by itself once per app version, not after every re-login
+        const psstAlertsSeen = window.localStorage.getItem("psst_alerts_auto_version");
 
         window.localStorage.clear();
 
@@ -1249,6 +1251,9 @@ export async function clearStorage(opts?: { deleteEverything?: boolean }): Promi
 
             if (registrationTime) {
                 window.localStorage.setItem("mx_registration_time", registrationTime);
+            }
+            if (psstAlertsSeen) {
+                window.localStorage.setItem("psst_alerts_auto_version", psstAlertsSeen);
             }
         }
     }
