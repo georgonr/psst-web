@@ -37,6 +37,8 @@ interface IProps {
     phase?: Phase;
     onClose: () => void;
     isRoomEncrypted: boolean;
+    /** PSST (D71): offer "Send again" when our own self-verification request was cancelled or timed out. */
+    onResend?: () => void;
 }
 
 interface IState {
@@ -299,7 +301,24 @@ export default class VerificationPanel extends React.PureComponent<IProps, IStat
             <div className="mx_UserInfo_container">
                 <p>{_t("encryption|verification|cancelled_verification")}</p>
 
-                <AccessibleButton kind="primary" className="mx_UserInfo_wideButton" onClick={this.props.onClose}>
+                {this.props.onResend && (
+                    <>
+                        <p>{_t("encryption|verification|psst_open_app_now")}</p>
+                        <AccessibleButton
+                            kind="primary"
+                            className="mx_UserInfo_wideButton"
+                            onClick={this.props.onResend}
+                            data-testid="psst-send-again"
+                        >
+                            {_t("encryption|verification|psst_send_again")}
+                        </AccessibleButton>
+                    </>
+                )}
+                <AccessibleButton
+                    kind={this.props.onResend ? "secondary" : "primary"}
+                    className="mx_UserInfo_wideButton"
+                    onClick={this.props.onClose}
+                >
                     {_t("action|got_it")}
                 </AccessibleButton>
             </div>

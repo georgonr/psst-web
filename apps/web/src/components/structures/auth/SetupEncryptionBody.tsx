@@ -116,6 +116,7 @@ export default class SetupEncryptionBody extends React.Component<IProps, IState>
         const { finished: verificationFinished } = Modal.createDialog(VerificationRequestDialog, {
             verificationRequestPromise: requestPromise,
             member: cli.getUser(userId) ?? undefined,
+            allowResend: true, // PSST (D71): "Send again" while waiting for the other device
         });
 
         void verificationFinished.then(async () => {

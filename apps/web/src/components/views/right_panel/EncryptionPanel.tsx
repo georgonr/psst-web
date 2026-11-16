@@ -23,6 +23,7 @@ import { _t } from "../../../languageHandler";
 import { RightPanelPhases } from "../../../stores/right-panel/RightPanelStorePhases";
 import ErrorDialog from "../dialogs/ErrorDialog";
 import { SDKContext } from "../../../contexts/SDKContext.ts";
+import { PsstSelfVerificationWaiting } from "./PsstSelfVerificationWaiting";
 
 // cancellation codes which constitute a key mismatch
 const MISMATCHES = ["m.key_mismatch", "m.user_error", "m.mismatched_sas"];
@@ -34,11 +35,24 @@ interface IProps {
     verificationRequestPromise?: Promise<VerificationRequest>;
     layout: string;
     isRoomEncrypted: boolean;
+    /**
+     * PSST (D71): if set, our own "Use another device" request can be replaced by a new one ("Send again").
+     * Called with the new request once it has been sent.
+     */
+    onSelfVerificationResent?: (request: VerificationRequest) => void;
 }
 
 const EncryptionPanel: React.FC<IProps> = (props: IProps) => {
     const sdkContext = useContext(SDKContext);
-    const { verificationRequest, verificationRequestPromise, member, onClose, layout, isRoomEncrypted } = props;
+    const {
+        verificationRequest,
+        verificationRequestPromise,
+        member,
+        onClose,
+        layout,
+        isRoomEncrypted,
+        onSelfVerificationResent,
+    } = props;
     const [request, setRequest] = useState(verificationRequest);
     // state to show a spinner immediately after clicking "start verification",
     // before we have a request
@@ -106,6 +120,35 @@ const EncryptionPanel: React.FC<IProps> = (props: IProps) => {
 
     useTypedEventEmitter(request, VerificationRequestEvent.Change, changeHandler);
 
+    // PSST (D71): cancel our pending self-verification request and send a new one to our other devices.
+    const onResend = useCallback(async (): Promise<void> => {
+        const oldRequest = request;
+        setRequest(undefined);
+        setRequesting(true);
+        try {
+            await oldRequest?.cancel();
+        } catch (e) {
+            logger.warn("EncryptionPanel: failed to cancel the previous verification request", e);
+        }
+        try {
+            const newRequest = await sdkContext.client!.getCrypto()!.requestOwnUserVerification();
+            setRequest(newRequest);
+            setPhase(newRequest.phase);
+            onSelfVerificationResent?.(newRequest);
+        } catch (e) {
+            logger.error("EncryptionPanel: failed to send a new verification request", e);
+            Modal.createDialog(ErrorDialog, {
+                headerImage: ErrorSolidIcon,
+                title: _t("encryption|verification|error_starting_title"),
+                description: _t("encryption|verification|error_starting_description"),
+            });
+            setRequest(oldRequest);
+            setPhase(oldRequest?.phase);
+        } finally {
+            setRequesting(false);
+        }
+    }, [request, sdkContext.client, onSelfVerificationResent]);
+
     const onStartVerification = useCallback(async (): Promise<void> => {
         setRequesting(true);
         let verificationRequest_: VerificationRequest;
@@ -144,8 +187,13 @@ const EncryptionPanel: React.FC<IProps> = (props: IProps) => {
             (phase === VerificationPhase.Requested || phase === VerificationPhase.Unsent || phase === undefined));
     const isSelfVerification = request ? request.isSelfVerification : member.userId === sdkContext.client?.getUserId();
 
+    const canResend = !!onSelfVerificationResent && isSelfVerification && (!request || request.initiatedByMe);
+
     if (!request || requested) {
         const initiatedByMe = (!request && isRequesting) || (!!request && request.initiatedByMe);
+        if (canResend && requested && initiatedByMe) {
+            return <PsstSelfVerificationWaiting request={request} onResend={onResend} />;
+        }
         return (
             <EncryptionInfo
                 isRoomEncrypted={isRoomEncrypted}
@@ -167,6 +215,7 @@ const EncryptionPanel: React.FC<IProps> = (props: IProps) => {
                 request={request}
                 key={request.transactionId}
                 phase={phase}
+                onResend={canResend ? onResend : undefined}
             />
         );
     }

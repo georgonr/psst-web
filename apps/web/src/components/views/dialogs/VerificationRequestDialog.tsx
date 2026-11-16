@@ -21,6 +21,11 @@ interface IProps {
     verificationRequestPromise?: Promise<VerificationRequest>;
     onFinished: () => void;
     member?: User;
+    /**
+     * PSST (D71): our own "Use another device" request may be replaced by a new one ("Send again"). A replaced
+     * request is cancelled here when the dialog closes; the original one is cancelled by the caller.
+     */
+    allowResend?: boolean;
 }
 
 interface IState {
@@ -39,6 +44,7 @@ interface IState {
 
 export default class VerificationRequestDialog extends React.Component<IProps, IState> {
     private unmounted = false;
+    private resentRequest?: VerificationRequest;
 
     public constructor(props: IProps) {
         super(props);
@@ -72,7 +78,21 @@ export default class VerificationRequestDialog extends React.Component<IProps, I
         this.unmounted = true;
         // Stop listening for changes to the request when we close
         this.state.verificationRequest?.off(VerificationRequestEvent.Change, this.onRequestChange);
+        // PSST (D71): a request we sent again is ours to cancel (no-op if it is already done or cancelled)
+        void this.resentRequest?.cancel();
     }
+
+    /** PSST (D71): EncryptionPanel cancelled our request and sent a new one. */
+    private readonly onSelfVerificationResent = (request: VerificationRequest): void => {
+        if (this.unmounted) {
+            void request.cancel();
+            return;
+        }
+        this.resentRequest = request;
+        this.state.verificationRequest?.off(VerificationRequestEvent.Change, this.onRequestChange);
+        request.on(VerificationRequestEvent.Change, this.onRequestChange);
+        this.setState({ verificationRequest: request, phase: request.phase });
+    };
 
     /**
      * The verificationRequest changed, so we need to make sure we update our
@@ -110,6 +130,7 @@ export default class VerificationRequestDialog extends React.Component<IProps, I
                     onClose={this.props.onFinished}
                     member={member}
                     isRoomEncrypted={false}
+                    onSelfVerificationResent={this.props.allowResend ? this.onSelfVerificationResent : undefined}
                 />
             </BaseDialog>
         );
