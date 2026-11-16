@@ -650,6 +650,18 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
     }
 
     private onAction = (payload: ActionPayload): void => {
+        // PSST (D62): the current device lost its verification while the app is open → back to the blocking
+        // "Confirm your digital identity" screen (force_verification), instead of a dismissible toast.
+        if (payload.action === "psst_force_verification") {
+            if (this.state.view === Views.LOGGED_IN) {
+                void this.shouldForceVerification().then((force) => {
+                    if (force && this.state.view === Views.LOGGED_IN) {
+                        this.setStateForNewView({ view: Views.COMPLETE_SECURITY });
+                    }
+                });
+            }
+            return;
+        }
         // once the session lock has been stolen, don't try to do anything.
         if (this.state.view === Views.LOCK_STOLEN) {
             logger.warn(`MatrixChat: ignoring action ${payload.action} as session lock has been stolen`);
@@ -1388,12 +1400,20 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
     private async shouldForceVerification(): Promise<boolean> {
         if (!SdkConfig.get("force_verification")) return false;
         const mustVerifyFlag = localStorage.getItem("force_verification_on_at_login");
-        if (!mustVerifyFlag) return false;
 
         const client = MatrixClientPeg.safeGet();
         if (client.isGuest()) return false;
 
         const crypto = client.getCrypto();
+        if (!mustVerifyFlag) {
+            // PSST (D62): with force_verification also block existing sessions that are no longer verified, e.g.
+            // after the digital identity was reset on another device. Upstream only shows a dismissible
+            // "Verify this device" toast there, so the app keeps working and looks verified although it is not.
+            if (!crypto || !(await crypto.userHasCrossSigningKeys(client.getSafeUserId(), true))) return false;
+            const status = await crypto.getDeviceVerificationStatus(client.getSafeUserId(), client.getDeviceId()!);
+            return !status?.crossSigningVerified;
+        }
+
         const crossSigningReady = await crypto?.isCrossSigningReady();
 
         return !crossSigningReady;

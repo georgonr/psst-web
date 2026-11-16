@@ -25,6 +25,8 @@ import {
     showToast as showSetupEncryptionToast,
 } from "../toasts/SetupEncryptionToast";
 import { isSecretStorageBeingAccessed } from "../SecurityManager";
+import SdkConfig from "../SdkConfig";
+import defaultDispatcher from "../dispatcher/dispatcher";
 
 const KEY_BACKUP_POLL_INTERVAL = 5 * 60 * 1000;
 
@@ -223,6 +225,8 @@ export class DeviceListenerCurrentDevice {
         } else {
             // The current device is not trusted: prompt the user to verify
             await this.failedCheck("verify_this_session", logSpan, "info", "Current device not verified");
+            // PSST (D62): with force_verification the app switches to the blocking verification screen.
+            if (SdkConfig.get("force_verification")) defaultDispatcher.dispatch({ action: "psst_force_verification" });
             return true;
         }
     }
