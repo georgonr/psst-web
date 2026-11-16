@@ -9,6 +9,7 @@ Please see LICENSE files in the repository root for full details.
 
 import UAParser from "ua-parser-js";
 import { logger } from "matrix-js-sdk/src/logger";
+import { type MatrixEvent, type Room } from "matrix-js-sdk/src/matrix";
 
 import { MatrixClientPeg } from "../../MatrixClientPeg";
 import BasePlatform, { UpdateCheckStatus, type UpdateStatus } from "../../BasePlatform";
@@ -22,6 +23,18 @@ import { GenericToast } from "@element-hq/web-shared-components";
 import SdkConfig from "../../SdkConfig.ts";
 import type { ActionPayload } from "../../dispatcher/payloads.ts";
 import * as SessionLock from "../../utils/SessionLock.ts";
+import SettingsStore from "../../settings/SettingsStore.ts";
+import { localNotificationsAreSilenced } from "../../utils/notifications.ts";
+import { type ViewRoomPayload } from "../../dispatcher/payloads/ViewRoomPayload.ts";
+import {
+    closeRoomNotifications,
+    forgetWebPush,
+    removeWebPush,
+    roomTag,
+    syncWebPush,
+    webPushActive,
+    webPushSupported,
+} from "./PsstWebPush.ts";
 
 const POKE_RATE_MS = 10 * 60 * 1000; // 10 min
 
@@ -39,6 +52,7 @@ export default class WebPlatform extends BasePlatform {
     private static readonly VERSION = process.env.VERSION!; // baked in by Webpack
     private readonly registerServiceWorkerPromise: Promise<void>;
     private updateCheckInterval?: number;
+    private psstSwRegistration?: ServiceWorkerRegistration;
 
     public constructor() {
         super();
@@ -57,8 +71,71 @@ export default class WebPlatform extends BasePlatform {
             case Action.ClientStarted:
                 // Defer drawing the toast until the client is started as the lifecycle methods reset the ToastStore right before
                 this.registerServiceWorkerPromise.catch(this.handleServiceWorkerRegistrationError);
+                this.psstStartWebPush();
+                break;
+            case "notifier_enabled":
+                this.psstSyncWebPush();
                 break;
         }
+    }
+
+    // ---- PSST Web Push (D76) ----
+    private psstWebPushWatchers: string[] = [];
+
+    private psstStartWebPush(): void {
+        if (!webPushSupported()) return;
+        if (this.psstWebPushWatchers.length === 0) {
+            for (const name of ["notificationsEnabled", "deviceNotificationsEnabled"] as const) {
+                this.psstWebPushWatchers.push(SettingsStore.watchSetting(name, null, () => this.psstSyncWebPush()));
+            }
+            void navigator.permissions
+                ?.query({ name: "notifications" })
+                .then((status) => {
+                    status.onchange = (): void => this.psstSyncWebPush();
+                })
+                .catch(() => {});
+        }
+        // wait for the first sync: push rules and the per-device notification settings come with it
+        let tries = 0;
+        const attempt = (): void => {
+            const client = MatrixClientPeg.get();
+            if (!client) return;
+            if (client.isInitialSyncComplete() && client.pushRules) {
+                this.psstSyncWebPush();
+            } else if (++tries < 120) {
+                window.setTimeout(attempt, 1000);
+            }
+        };
+        attempt();
+    }
+
+    private psstSyncWebPush(): void {
+        const client = MatrixClientPeg.get();
+        if (!client?.pushRules) return; // not synced yet (we would wrongly see notifications as disabled)
+        let enabled = false;
+        try {
+            enabled =
+                window.Notification?.permission === "granted" &&
+                Boolean(SettingsStore.getValue("notificationsEnabled")) &&
+                !localNotificationsAreSilenced(client);
+        } catch (e) {
+            logger.warn("[psst web push] cannot read notification settings", e);
+            return;
+        }
+        void syncWebPush(client, enabled);
+    }
+
+    public async psstRemoveWebPush(): Promise<void> {
+        await removeWebPush(MatrixClientPeg.get());
+    }
+
+    public async clearStorage(): Promise<void> {
+        await super.clearStorage();
+        await forgetWebPush();
+    }
+
+    public psstCloseRoomNotifications(roomId: string): void {
+        if (webPushActive()) void closeRoomNotifications(roomId);
     }
 
     private async registerServiceWorker(): Promise<void> {
@@ -70,6 +147,7 @@ export default class WebPlatform extends BasePlatform {
         if (!registration) {
             throw new Error("Service worker registration failed");
         }
+        this.psstSwRegistration = registration;
 
         await registration.update();
 
@@ -101,6 +179,17 @@ export default class WebPlatform extends BasePlatform {
 
     private onServiceWorkerPostMessage = (event: MessageEvent): void => {
         try {
+            if (event.data?.["type"] === "psst_view_room" && typeof event.data?.["room_id"] === "string") {
+                // PSST (D76): click on a notification shown by the service worker
+                const payload: ViewRoomPayload = {
+                    action: Action.ViewRoom,
+                    room_id: event.data["room_id"],
+                    metricsTrigger: "Notification",
+                };
+                if (typeof event.data["event_id"] === "string") payload.event_id = event.data["event_id"];
+                dis.dispatch(payload);
+                return;
+            }
             if (event.data?.["type"] === "userinfo" && event.data?.["responseKey"]) {
                 const userId = localStorage.getItem("mx_user_id");
                 const deviceId = localStorage.getItem("mx_device_id");
@@ -207,6 +296,8 @@ export default class WebPlatform extends BasePlatform {
     public destroy(): void {
         super.destroy();
         clearInterval(this.updateCheckInterval);
+        this.psstWebPushWatchers.forEach((ref) => SettingsStore.unwatchSetting(ref));
+        this.psstWebPushWatchers = [];
     }
 
     public async canSelfUpdate(): Promise<boolean> {
@@ -285,6 +376,51 @@ export default class WebPlatform extends BasePlatform {
 
     public reload(): void {
         window.location.reload();
+    }
+
+    /**
+     * PSST (D76): with Web Push active, the app shows its notifications through the service worker with the same
+     * per-room tag the service worker uses for pushes, so a push for a message the app already announced (tab open
+     * in the background) does not show a second notification, and the app's richer notification replaces a generic
+     * "New message" one.
+     */
+    public displayNotification(
+        title: string,
+        msg: string,
+        avatarUrl: string | null,
+        room: Room,
+        ev?: MatrixEvent,
+    ): Notification {
+        const reg = webPushActive() ? this.psstSwRegistration : undefined;
+        if (!reg) return super.displayNotification(title, msg, avatarUrl, room, ev);
+        const tag = roomTag(room.roomId);
+        const options: NotificationOptions & { renotify?: boolean } = {
+            body: msg,
+            silent: true, // we play our own sounds
+            tag,
+            data: {
+                room_id: room.roomId,
+                event_id: ev?.getId(),
+                view_event_id: ev?.getThread() ? ev.getId() : undefined,
+                psst_app: true,
+            },
+        };
+        if (avatarUrl) options.icon = avatarUrl;
+        reg.showNotification(title, options).catch((e) => {
+            logger.warn("[psst web push] showNotification failed, falling back", e);
+            super.displayNotification(title, msg, avatarUrl, room, ev);
+        });
+        // Notifier only needs close(): close what the service worker shows for this room
+        const eventId = ev?.getId();
+        return {
+            close: (): void => {
+                void reg
+                    .getNotifications({ tag })
+                    .then((list) =>
+                        list.filter((n) => !eventId || n.data?.event_id === eventId).forEach((n) => n.close()),
+                    );
+            },
+        } as unknown as Notification;
     }
 
     public checkSessionLockFree(): boolean {

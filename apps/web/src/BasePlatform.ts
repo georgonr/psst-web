@@ -440,6 +440,15 @@ export default abstract class BasePlatform {
     public async clearStorage(): Promise<void> {}
 
     /**
+     * PSST (D76): remove this browser's Web Push pusher + subscription before the session is logged out.
+     * Only the web build has Web Push; other platforms (Electron) do nothing.
+     */
+    public async psstRemoveWebPush(): Promise<void> {}
+
+    /** PSST (D76): close notifications shown through the service worker for a room (web only). */
+    public psstCloseRoomNotifications(roomId: string): void {}
+
+    /**
      * Base URL to use when generating external links for this client, for platforms e.g. Desktop this will be a different instance
      */
     public get baseUrl(): string {

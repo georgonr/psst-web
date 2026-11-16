@@ -591,6 +591,8 @@ export default class Notifier extends TypedEventEmitter<keyof EmittedEvents, Emi
 
     private onRoomReceipt = (ev: MatrixEvent, room: Room): void => {
         if (room.getUnreadNotificationCount() === 0) {
+            // PSST (D76): also close "New message" notifications the service worker showed for pushes
+            PlatformPeg.get()?.psstCloseRoomNotifications?.(room.roomId);
             // ideally we would clear each notification when it was read,
             // but we have no way, given a read receipt, to know whether
             // the receipt comes before or after an event, so we can't

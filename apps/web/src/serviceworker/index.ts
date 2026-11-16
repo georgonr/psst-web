@@ -129,6 +129,92 @@ self.addEventListener("fetch", (event) => {
     );
 });
 
+// ---------------------------------------------------------------------------------------------------------------
+// PSST Web Push (DECISIONS D76). Synapse → Sygnal (webpush, format event_id_only) → browser push service → here.
+// The payload has only ids and counts (no message content, nothing is decrypted). When an app window is focused the
+// app shows its own notifications; otherwise we show a generic one, one per room (tag), replaced by later ones.
+
+interface PsstPushPayload {
+    room_id?: string;
+    event_id?: string;
+    type?: string;
+    unread?: number;
+    psst_lang?: string;
+}
+
+const PSST_TEXT: Record<string, { message: string; verification: string }> = {
+    sk: { message: "Nová správa", verification: "Žiadosť o overenie — otvorte psst" },
+    cs: { message: "Nová zpráva", verification: "Žádost o ověření — otevřete psst" },
+    en: { message: "New message", verification: "Verification request — open psst" },
+};
+
+function psstText(lang?: string): { message: string; verification: string } {
+    const l = (lang || self.navigator.language || "en").toLowerCase().split(/[-_]/)[0];
+    return PSST_TEXT[l] ?? PSST_TEXT.en;
+}
+
+function psstIsVerification(roomId?: string): boolean {
+    return Boolean(roomId?.startsWith("!psst-verification:"));
+}
+
+async function psstOnPush(data: PsstPushPayload): Promise<void> {
+    const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    if (windows.some((w) => w.focused && w.visibilityState === "visible")) {
+        return; // the app is in front: it shows its own notification (and the browser needs none from us)
+    }
+    const verification = psstIsVerification(data.room_id);
+    const tag = verification ? "psst-verification" : data.room_id ? `psst-room-${data.room_id}` : "psst";
+    if (!verification && data.event_id) {
+        // the app (open in a background tab) may already have announced this very event
+        const shown = await self.registration.getNotifications({ tag });
+        if (shown.some((n) => n.data?.event_id === data.event_id)) return;
+    }
+    const text = psstText(data.psst_lang);
+    const options: NotificationOptions & { renotify?: boolean } = {
+        body: verification ? text.verification : text.message,
+        tag,
+        renotify: true,
+        icon: new URL("vector-icons/180.png", self.registration.scope).href,
+        badge: new URL("vector-icons/120.png", self.registration.scope).href,
+        data: { room_id: verification ? undefined : data.room_id, event_id: data.event_id, psst_push: true },
+    };
+    await self.registration.showNotification("psst", options);
+}
+
+self.addEventListener("push", (event: PushEvent) => {
+    let data: PsstPushPayload = {};
+    try {
+        data = (event.data?.json() as PsstPushPayload) ?? {};
+    } catch {
+        data = {};
+    }
+    event.waitUntil(
+        psstOnPush(data).catch((e) => {
+            console.error("[psst push] failed", e);
+            return self.registration.showNotification("psst", { body: psstText(data.psst_lang).message, tag: "psst" });
+        }),
+    );
+});
+
+self.addEventListener("notificationclick", (event: NotificationEvent) => {
+    const data = (event.notification.data ?? {}) as { room_id?: string; view_event_id?: string };
+    event.notification.close();
+    const roomId = typeof data.room_id === "string" ? data.room_id : undefined;
+    const url = new URL(roomId ? `#/room/${roomId}` : "#/home", self.registration.scope).href;
+    event.waitUntil(
+        (async (): Promise<void> => {
+            const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+            const win = windows.find((w) => w.focused) ?? windows[0];
+            if (win) {
+                await win.focus();
+                if (roomId) win.postMessage({ type: "psst_view_room", room_id: roomId, event_id: data.view_event_id });
+                return;
+            }
+            await self.clients.openWindow(url);
+        })(),
+    );
+});
+
 async function tryUpdateServerSupportMap(clientApiUrl: string, accessToken?: string): Promise<void> {
     // only update if we don't know about it, or if the data is stale
     if (serverSupportMap[clientApiUrl]?.cacheExpiryTimeMs > new Date().getTime()) {

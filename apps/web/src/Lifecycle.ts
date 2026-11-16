@@ -1034,6 +1034,16 @@ export async function logout(): Promise<void> {
     _isLoggingOut = true;
     void PlatformPeg.get()?.destroyPickleKey(client.getSafeUserId(), client.getDeviceId() ?? "");
 
+    // PSST (D76): remove the Web Push pusher while the access token still works (bounded wait)
+    try {
+        await Promise.race([
+            PlatformPeg.get()?.psstRemoveWebPush?.(),
+            new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+        ]);
+    } catch (err) {
+        logger.warn("PSST: removing web push failed", err);
+    }
+
     try {
         await client.logout(true);
     } catch (err) {
