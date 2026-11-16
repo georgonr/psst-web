@@ -446,7 +446,8 @@ export async function psstOpenSystemSettings(what: "notifications" | "microphone
     await psstIpc()?.("openSettings", what);
 }
 
-const TEST_ROOM = { roomId: "!psst-test-notification:local" } as unknown as Room;
+// No room: a click on the test notification only brings psst to the front (also via the D76 service worker).
+const TEST_ROOM = { roomId: "" } as unknown as Room;
 
 /**
  * Show a notification through the same platform notifier as real messages (BasePlatform/ElectronPlatform
