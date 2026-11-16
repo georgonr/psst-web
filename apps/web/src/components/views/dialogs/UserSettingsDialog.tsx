@@ -23,6 +23,7 @@ import LockIcon from "@vector-im/compound-design-tokens/assets/web/icons/lock";
 import LabsIcon from "@vector-im/compound-design-tokens/assets/web/icons/labs";
 import BlockIcon from "@vector-im/compound-design-tokens/assets/web/icons/block";
 import HelpIcon from "@vector-im/compound-design-tokens/assets/web/icons/help";
+import VoiceCallIcon from "@vector-im/compound-design-tokens/assets/web/icons/voice-call";
 import { ToastContext, useActiveToast } from "@element-hq/web-shared-components";
 
 import TabbedView, { Tab, useActiveTabWithDefault } from "../../structures/TabbedView";
@@ -33,6 +34,7 @@ import LabsUserSettingsTab, { showLabsFlags } from "../settings/tabs/user/LabsUs
 import AppearanceUserSettingsTab from "../settings/tabs/user/AppearanceUserSettingsTab";
 import SecurityUserSettingsTab from "../settings/tabs/user/SecurityUserSettingsTab";
 import NotificationUserSettingsTab from "../settings/tabs/user/NotificationUserSettingsTab";
+import PsstAlertsUserSettingsTab from "../settings/tabs/user/PsstAlertsUserSettingsTab";
 import PreferencesUserSettingsTab from "../settings/tabs/user/PreferencesUserSettingsTab";
 import VoiceUserSettingsTab from "../settings/tabs/user/VoiceUserSettingsTab";
 import HelpUserSettingsTab from "../settings/tabs/user/HelpUserSettingsTab";
@@ -80,6 +82,8 @@ function titleForTabID(tabId: UserTab): React.ReactNode {
             return _t("settings|appearance|dialog_title", undefined, subs);
         case UserTab.Notifications:
             return _t("settings|notifications|dialog_title", undefined, subs);
+        case UserTab.PsstAlerts:
+            return _t("psst_alerts|dialog_title", undefined, subs);
         case UserTab.Preferences:
             return _t("settings|preferences|dialog_title", undefined, subs);
         case UserTab.Keyboard:
@@ -166,6 +170,15 @@ export default function UserSettingsDialog(props: IProps): JSX.Element {
                 <NotificationsIcon />,
                 <NotificationUserSettingsTab />,
                 "UserSettingsNotifications",
+            ),
+        );
+        // PSST (D75): one screen with the real system state of everything needed for messages and calls
+        tabs.push(
+            new Tab(
+                UserTab.PsstAlerts,
+                _td("psst_alerts|title"),
+                <VoiceCallIcon />,
+                <PsstAlertsUserSettingsTab />,
             ),
         );
         tabs.push(

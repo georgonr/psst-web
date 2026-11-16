@@ -69,6 +69,7 @@ import LoggedInView from "./LoggedInView";
 import { Action } from "../../dispatcher/actions";
 import { hideToast as hideAnalyticsToast, showToast as showAnalyticsToast } from "../../toasts/AnalyticsToast";
 import { showToast as showNotificationsToast } from "../../toasts/DesktopNotificationsToast";
+import { psstMaybeAutoOpenAlerts } from "../../utils/PsstAlerts";
 import { type OpenToTabPayload } from "../../dispatcher/payloads/OpenToTabPayload";
 import ErrorDialog from "../views/dialogs/ErrorDialog";
 import {
@@ -1685,6 +1686,8 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
             if (this.stores.notifier.shouldShowPrompt() && !MatrixClientPeg.userRegisteredWithinLastHours(24)) {
                 showNotificationsToast(this.stores.notifier, false);
             }
+            // PSST (D75): first run / new version → open "Notifications & calls" if something required is missing
+            void psstMaybeAutoOpenAlerts(cli, () => this.state.view === Views.LOGGED_IN);
 
             dis.fire(Action.FocusSendMessageComposer);
         });

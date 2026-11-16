@@ -10,6 +10,7 @@ export enum UserTab {
     Account = "USER_ACCOUNT_TAB",
     Appearance = "USER_APPEARANCE_TAB",
     Notifications = "USER_NOTIFICATIONS_TAB",
+    PsstAlerts = "USER_PSST_ALERTS_TAB", // PSST (D75): Notifications & calls
     Preferences = "USER_PREFERENCES_TAB",
     Keyboard = "USER_KEYBOARD_TAB",
     Sidebar = "USER_SIDEBAR_TAB",

@@ -32,6 +32,7 @@ import "./seshat.js";
 import "./settings.js";
 import "./badge.js";
 import "./x509.js";
+import "./psst-alerts.js"; // PSST: system state for Settings → Notifications & calls (D75)
 import * as tray from "./tray.js";
 import Store from "./store.js";
 import { buildMenuTemplate } from "./vectormenu.js";

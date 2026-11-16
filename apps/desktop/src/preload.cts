@@ -79,6 +79,11 @@ contextBridge.exposeInMainWorld("electron", {
         return ipcRenderer.invoke("getSettingValue", settingName);
     },
 
+    // PSST: Settings → Notifications & calls reads the real OS state (D75, psst-alerts.ts)
+    async psstAlerts(op: string, arg?: string): Promise<any> {
+        return ipcRenderer.invoke("psstAlerts", op, arg);
+    },
+
     // X.509 hardware-key IPC
     x509: {
         getUserCertificate: () => ipcRenderer.invoke("x509", "getUserCertificate"),

@@ -50,6 +50,8 @@ import { useDispatcher } from "../hooks/useDispatcher";
 import { type ActionPayload } from "../dispatcher/payloads";
 import { type Call, CallEvent } from "../models/Call";
 import { AudioID } from "../LegacyCallHandler";
+import { psstCallRuleRings } from "../utils/PsstAlerts";
+import { localNotificationsAreSilenced } from "../utils/notifications";
 import { useEventEmitter, useTypedEventEmitter } from "../hooks/useEventEmitter";
 import { CallStore, CallStoreEvent } from "../stores/CallStore";
 import DMRoomMap from "../utils/DMRoomMap";
@@ -176,7 +178,17 @@ export function IncomingCallToast({ notificationEvent, toastKey }: Props): JSX.E
         // This is because `LegacyCallHandler.play` tries to load the sound and then play it asynchonously
         // and `LegacyCallHandler.isPlaying` will not be `true` until the sound starts playing.
         const isRingToast = notificationContent.notification_type === "ring";
-        if (isRingToast && !soundHasStarted.current && !sdkContext.legacyCallHandler.isPlaying(AudioID.Ring)) {
+        // PSST (D75): ring only when Element's "Call invitation" rule rings and the session isn't silenced, so the
+        // "Call ringing" switch in Settings → Notifications & calls also applies to Element Call.
+        const psstMayRing =
+            !sdkContext.client ||
+            (psstCallRuleRings(sdkContext.client) && !localNotificationsAreSilenced(sdkContext.client));
+        if (
+            isRingToast &&
+            psstMayRing &&
+            !soundHasStarted.current &&
+            !sdkContext.legacyCallHandler.isPlaying(AudioID.Ring)
+        ) {
             // Start ringing if not already.
             soundHasStarted.current = true;
             void sdkContext.legacyCallHandler.play(AudioID.Ring);
