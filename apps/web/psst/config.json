@@ -50,15 +50,19 @@
             },
             {
                 "text": "Podmienky / Terms",
-                "url": "https://app.psst.pro/terms.html"
+                "url": "https://psst.pro/terms"
             },
             {
                 "text": "Súkromie / Privacy",
-                "url": "https://app.psst.pro/privacy.html"
+                "url": "https://psst.pro/privacy"
             },
             {
                 "text": "Source code",
                 "url": "https://github.com/georgonr/psst"
+            },
+            {
+                "text": "psst@psst.pro",
+                "url": "mailto:psst@psst.pro"
             }
         ]
     },
@@ -131,12 +135,20 @@
     },
     "terms_and_conditions_links": [
         {
-            "text": "Podmienky používania / Terms",
-            "url": "https://app.psst.pro/terms.html"
+            "text": "Podmienky používania / Terms of Use",
+            "url": "https://psst.pro/terms"
         },
         {
-            "text": "Ochrana súkromia / Privacy",
-            "url": "https://app.psst.pro/privacy.html"
+            "text": "Zásady ochrany súkromia / Privacy Policy",
+            "url": "https://psst.pro/privacy"
+        },
+        {
+            "text": "Zmazanie účtu / Delete account",
+            "url": "https://psst.pro/delete-account"
+        },
+        {
+            "text": "Kontakt / Contact: psst@psst.pro",
+            "url": "mailto:psst@psst.pro"
         }
     ]
 }
