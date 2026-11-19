@@ -1,5 +1,5 @@
 /*
- * PSST: "new version available" check against https://app.macet.eu/download (DECISIONS D59).
+ * PSST: "new version available" check against https://app.psst.pro/download (DECISIONS D59).
  *
  * Element's auto-updater needs Squirrel (not MSI) on Windows and a signed app on macOS, and points at Element's
  * servers — psst does not use it. Instead, shortly after start and then once a day, the app reads the public
@@ -9,7 +9,7 @@
 import { Notification, net, shell } from "electron";
 import { createRequire } from "node:module";
 
-const PAGE = "https://app.macet.eu/download/";
+const PAGE = "https://app.psst.pro/download/";
 const LATEST = PAGE + "latest.json";
 
 function installedBuild(): number {

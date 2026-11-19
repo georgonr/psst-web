@@ -537,8 +537,9 @@ export default class ElectronPlatform extends BasePlatform {
     }
 
     public get defaultOAuthClientUri(): string {
-        // PSST: our scheme `eu.macet.psst` is the reverse-DNS of macet.eu, so it is in scope on default MAS policies
-        return "https://macet.eu";
+        // PSST (D85): our callback scheme `pro.psst.app` is the reverse-DNS of app.psst.pro, so it is in scope on
+        // default MAS policies
+        return "https://app.psst.pro";
     }
 
     public async getOAuthClientMetadata(): Promise<OAuthRegistrationRequest> {

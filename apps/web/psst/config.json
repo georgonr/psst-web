@@ -1,8 +1,8 @@
 {
     "default_server_config": {
         "m.homeserver": {
-            "base_url": "https://chat.macet.eu",
-            "server_name": "chat.macet.eu"
+            "base_url": "https://chat.psst.pro",
+            "server_name": "psst.pro"
         }
     },
     "disable_custom_urls": true,
@@ -11,8 +11,8 @@
     "disable_3pid_login": true,
     "force_verification": true,
     "brand": "psst",
-    "permalink_prefix": "https://app.macet.eu",
-    "web_base_url": "https://app.macet.eu/",
+    "permalink_prefix": "https://app.psst.pro",
+    "web_base_url": "https://app.psst.pro/",
     "help_url": "https://github.com/georgonr/psst",
     "help_encryption_url": "https://github.com/georgonr/psst",
     "help_key_storage_url": "https://github.com/georgonr/psst",
@@ -25,7 +25,7 @@
     "default_theme": "custom-psst",
     "room_directory": {
         "servers": [
-            "chat.macet.eu"
+            "psst.pro"
         ]
     },
     "mobile_guide_toast": false,
@@ -40,21 +40,21 @@
         "fdroid": null
     },
     "branding": {
-        "logo_link_url": "https://app.macet.eu",
+        "logo_link_url": "https://app.psst.pro",
         "auth_header_logo_url": "themes/element/img/psst/psst-wordmark.svg",
         "welcome_background_url": "themes/element/img/psst/background.svg",
         "auth_footer_links": [
             {
                 "text": "Download apps",
-                "url": "https://app.macet.eu/download/"
+                "url": "https://app.psst.pro/download/"
             },
             {
                 "text": "Podmienky / Terms",
-                "url": "https://app.macet.eu/terms.html"
+                "url": "https://app.psst.pro/terms.html"
             },
             {
                 "text": "Súkromie / Privacy",
-                "url": "https://app.macet.eu/privacy.html"
+                "url": "https://app.psst.pro/privacy.html"
             },
             {
                 "text": "Source code",
@@ -124,19 +124,19 @@
         ]
     },
     "oidc_metadata": {
-        "client_uri": "https://app.macet.eu",
-        "logo_uri": "https://app.macet.eu/vector-icons/512.png",
-        "tos_uri": "https://app.macet.eu/terms.html",
-        "policy_uri": "https://app.macet.eu/privacy.html"
+        "client_uri": "https://app.psst.pro",
+        "logo_uri": "https://app.psst.pro/vector-icons/512.png",
+        "tos_uri": "https://app.psst.pro/terms.html",
+        "policy_uri": "https://app.psst.pro/privacy.html"
     },
     "terms_and_conditions_links": [
         {
             "text": "Podmienky používania / Terms",
-            "url": "https://app.macet.eu/terms.html"
+            "url": "https://app.psst.pro/terms.html"
         },
         {
             "text": "Ochrana súkromia / Privacy",
-            "url": "https://app.macet.eu/privacy.html"
+            "url": "https://app.psst.pro/privacy.html"
         }
     ]
 }

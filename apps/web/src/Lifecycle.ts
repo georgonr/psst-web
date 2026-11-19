@@ -719,6 +719,24 @@ export async function restoreSessionFromStorage(opts?: { ignoreGuest?: boolean }
         await abortLogin();
     }
 
+    // PSST (D85): the service moved to a new server (new server_name, new accounts — nothing was carried over). A
+    // session stored for a homeserver other than the one this build is configured for can never work again (custom
+    // servers are disabled): forget it locally — no request to the old server — and show sign-in for the new one.
+    if (hsUrl && SdkConfig.get().disable_custom_urls) {
+        const configured = SdkConfig.get().default_server_config?.["m.homeserver"]?.base_url;
+        let stale = false;
+        try {
+            stale = !!configured && new URL(hsUrl).origin !== new URL(configured).origin;
+        } catch {
+            stale = !!configured;
+        }
+        if (stale) {
+            logger.warn(`restoreSessionFromStorage: stored session is for ${hsUrl}, this build uses ${configured}: clearing it`);
+            await clearStorage();
+            return false;
+        }
+    }
+
     if (accessToken && userId && hsUrl) {
         if (ignoreGuest && isGuest) {
             logger.log("Ignoring stored guest account: " + userId);

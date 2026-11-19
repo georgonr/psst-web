@@ -4,7 +4,7 @@
     "productName": "psst",
     "description": "psst - private messenger",
     "protocols": [
-        "eu.macet.app",
+        "pro.psst.app",
         "eu.macet.psst",
         "psst"
     ]

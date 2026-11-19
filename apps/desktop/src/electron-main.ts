@@ -234,7 +234,7 @@ app.on("ready", async () => {
     } else {
         console.log("No update_base_url is defined: auto update is disabled");
     }
-    // PSST: notify about new builds from app.macet.eu/download instead of Element's updater (D59)
+    // PSST: notify about new builds from app.psst.pro/download instead of Element's updater (D59)
     if (args.update) startPsstUpdateCheck();
 
     // Set up i18n before loading storage as we need translations for dialogs
