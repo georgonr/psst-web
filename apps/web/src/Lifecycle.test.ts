@@ -25,6 +25,7 @@ import StorageEvictedDialog from "./components/views/dialogs/StorageEvictedDialo
 import * as Lifecycle from "./Lifecycle";
 import { MatrixClientPeg } from "./MatrixClientPeg";
 import Modal from "./Modal";
+import SdkConfig from "./SdkConfig";
 import * as StorageAccess from "./utils/StorageAccess";
 import { idbSave } from "./utils/StorageAccess";
 import { Action } from "./dispatcher/actions";
@@ -224,6 +225,36 @@ describe("Lifecycle", () => {
             await expect(() => restoreSessionFromStorage()).rejects.toThrow();
             expect(Modal.createDialog).toHaveBeenCalledWith(StorageEvictedDialog);
             expect(mockClient.clearStores).toHaveBeenCalled();
+        });
+
+        // PSST (D85): a session of another homeserver than the configured one (the retired server) is forgotten
+        describe("when the stored session belongs to another homeserver", () => {
+            beforeEach(() => {
+                for (const key in localStorageSession) {
+                    localStorage.setItem(key, localStorageSession[key]);
+                }
+                initIdbMock(idbStorageSession());
+                SdkConfig.put({
+                    disable_custom_urls: true,
+                    default_server_config: { "m.homeserver": { base_url: "https://hs.example.org" } },
+                });
+            });
+            afterEach(() => SdkConfig.reset());
+
+            it("clears it locally and restores nothing", async () => {
+                expect(await restoreSessionFromStorage()).toEqual(false);
+                expect(localStorage.getItem("mx_hs_url")).toBeNull();
+                expect(localStorage.getItem("mx_user_id")).toBeNull();
+                expect(createMatrixClientModule.createClientWithCreds).not.toHaveBeenCalled();
+            });
+
+            it("keeps a session of the configured homeserver", async () => {
+                SdkConfig.put({
+                    disable_custom_urls: true,
+                    default_server_config: { "m.homeserver": { base_url: homeserverUrl + "/" } },
+                });
+                expect(await restoreSessionFromStorage()).toEqual(true);
+            });
         });
 
         describe("when session is found in storage", () => {
