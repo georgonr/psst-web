@@ -10,6 +10,7 @@ import { useCallback, useState } from "react";
 
 import { MatrixClientPeg } from "../MatrixClientPeg";
 import { useLatestResult } from "./useLatestResult";
+import { psstExactUserId } from "../utils/psstExactUserId";
 
 export interface IProfileInfoOpts {
     query?: string;
@@ -36,6 +37,24 @@ export const useProfileInfo = (): {
     const search = useCallback(
         async ({ query: term }: IProfileInfoOpts): Promise<boolean> => {
             updateQuery(term);
+            // PSST (D88): a short account name ("jana") is looked up as the exact user @jana:<server>
+            const exactUserId = psstExactUserId(term, MatrixClientPeg.safeGet().getDomain());
+            if (exactUserId) {
+                setLoading(true);
+                try {
+                    const result = await MatrixClientPeg.safeGet().getProfileInfo(exactUserId);
+                    updateResult(term, {
+                        user_id: exactUserId,
+                        avatar_url: result.avatar_url,
+                        display_name: result.displayname,
+                    });
+                } catch {
+                    updateResult(term, null);
+                } finally {
+                    setLoading(false);
+                }
+                return true;
+            }
             if (!term?.length || !term.startsWith("@") || !term.includes(":")) {
                 setProfile(null);
                 return true;

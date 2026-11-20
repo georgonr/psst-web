@@ -62,6 +62,7 @@ import { DMRoomTile } from "./invite/DMRoomTile.tsx";
 import { logErrorAndShowErrorDialog } from "../../../utils/ErrorUtils.tsx";
 import UnknownIdentityUsersWarningDialog from "./invite/UnknownIdentityUsersWarningDialog.tsx";
 import { AddressType, getAddressType } from "../../../UserAddress.ts";
+import { psstExactUserId } from "../../../utils/psstExactUserId.ts";
 
 interface Result {
     userId: string;
@@ -359,6 +360,15 @@ export default class InviteDialog extends React.PureComponent<Props, IInviteDial
     }
 
     private convertFilter(): Member[] {
+        // PSST (D88): a short account name ("jana") becomes @jana:<server> once its profile was found
+        const exactUserId = psstExactUserId(this.state.filterText, MatrixClientPeg.safeGet().getDomain());
+        const found = this.state.serverResultsMixin?.some((m) => m.userId === exactUserId);
+        if (exactUserId && found && this.canInviteMore()) {
+            const newTargets = [...(this.state.targets || []), new DirectoryMember({ user_id: exactUserId })];
+            this.setState({ targets: newTargets, filterText: "" });
+            return newTargets;
+        }
+
         // Check to see if there's anything to convert first
         if (!this.state.filterText || !this.state.filterText.includes("@")) return this.state.targets || [];
 
@@ -553,6 +563,28 @@ export default class InviteDialog extends React.PureComponent<Props, IInviteDial
                         } catch (e) {
                             logger.warn("Non-fatal error trying to make an invite for a user ID", e);
                         }
+                    }
+
+                    // PSST (D88): no user directory on the server — a short account name is looked up as the
+                    // exact user @name:<server> and offered only if that profile exists
+                    const exactUserId = psstExactUserId(term, MatrixClientPeg.safeGet().getDomain());
+                    if (exactUserId && !r.results.some((u) => u.user_id === exactUserId)) {
+                        try {
+                            const profile = await this.profilesStore.getOrFetchProfile(exactUserId, {
+                                shouldThrow: true,
+                            });
+                            if (profile && term === this.state.filterText) {
+                                r.results.splice(0, 0, {
+                                    user_id: exactUserId,
+                                    display_name: profile["displayname"],
+                                    avatar_url: profile["avatar_url"],
+                                });
+                            }
+                        } catch (e) {
+                            logger.info("PSST: no account with the exact name", exactUserId);
+                        }
+                        // the extra lookup took time — results for an outdated term must not overwrite newer ones
+                        if (term !== this.state.filterText) return;
                     }
 
                     if (this.unmounted) return;

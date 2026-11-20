@@ -64,7 +64,7 @@ describe("useProfileInfo", () => {
     });
 
     it("should treat invalid mxids as empty queries", async () => {
-        const queries = ["@user", "user@home.server"];
+        const queries = ["@user", "user@home.server", "two words"];
 
         for (const query of queries) {
             const { result } = render();
@@ -76,6 +76,20 @@ describe("useProfileInfo", () => {
             await waitFor(() => expect(result.current.ready).toBe(true));
 
             expect(result.current.profile).toBeNull();
+        }
+    });
+
+    it("PSST: should look up a short account name as the exact user on our server", async () => {
+        for (const query of ["user", "User"]) {
+            const { result } = render();
+
+            await act(async () => {
+                await result.current.search({ query });
+            });
+
+            await waitFor(() => expect(result.current.ready).toBe(true));
+
+            expect(result.current.profile?.user_id).toBe(`@user:${cli.getDomain()}`);
         }
     });
 
